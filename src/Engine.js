@@ -72,7 +72,7 @@ module.exports = () => {
           return Questions(config, types)
         })
         .then(cz.prompt)
-        .then(res => format(res, config.formula))
+        .then(res => format(res, config.formula, config.formulaKeys))
         .then(commit)
     },
   }
