@@ -1,6 +1,7 @@
 'use strict'
+const util = require('util')
 const truncate = require('cli-truncate')
-var wrap = require('word-wrap')
+const wrap = require('word-wrap')
 const Loader = require('./Loader.js')
 const Types = require('./Types.js')
 const Questions = require('./Questions.js')
@@ -12,35 +13,33 @@ var filter = function (array) {
 }
 
 // TODO: Used quesions map to formula
-function format (answers, formulaString) {
-  // TODO: Use template engine
-  let formula = formulaString || '${name}${scope}: ${subject}' // eslint-disable-line no-template-curly-in-string
-  let target = formula.match(/\${(.+?)}/g)
-  target.map(string => {
-    const key = string.match(/\${(.+?)}/)[1]
+function format (answers, template = null, keys = null) {
+  template = template || '%s%s%s: %s'
+  keys = keys || ['emoji', 'name', 'scope', 'subject']
+
+  let values = []
+  for (let key of keys) {
     switch (key) {
-      case 'emoji':
-      case 'title':
-      case 'name':
-        const value = answers.type[key]
-        formula = formula.replace(string, value)
-        break
       case 'scope':
-        // parentheses are only needed when a scope is present
-        let scope = answers.scope
-        scope = (scope) ? `(${scope})` : ''
-        formula = formula.replace(string, scope)
+        let v = answers[key]
+        v = v ? `(${v})` : ''
+        values.push(v)
         break
-      case 'subject':
+      // The keywords not allow using in head
       case 'body':
-        formula = formula.replace(string, answers[key])
         break
       default:
-        console.error('error key with ' + string)
+        if (answers[key]) {
+          values.push(answers[key])
+        } else if (answers.type[key]) {
+          values.push(answers.type[key])
+        } else {
+          values.push('')
+        }
     }
-  })
-
-  const head = truncate(formula.trim(), 100)
+  }
+  const message = util.format(template, ...values)
+  const head = truncate(message.trim(), 100)
 
   // Wrap these lines at 100 characters
   var wrapOptions = {
