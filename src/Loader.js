@@ -12,7 +12,7 @@ function findConfigFileInDir (dir) {
   // recursive find parent folders
   for (const fname of possibleFiles) {
     let f = path.join(dir, fname)
-    if (fs.lstatSync(f).isFile) {
+    if (fs.existsSync(f)) {
       return f
     }
   }
