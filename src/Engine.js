@@ -64,6 +64,7 @@ function format (answers, template = null, keys = null) {
 module.exports = () => {
   return {
     prompter: function (cz, commit) {
+      cz.prompt.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'))
       let config = {}
       Loader()
         .then(res => {
