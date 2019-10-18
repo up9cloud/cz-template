@@ -34,6 +34,7 @@
     "eslint-plugin-standard": "^3.1.0"
   },
   "dependencies": {
+    "home-dir": "^1.0.0",
     "fuse.js": "^3.2.0",
     "cli-truncate": "^1.1.0",
     "word-wrap": "^1.2.3",
