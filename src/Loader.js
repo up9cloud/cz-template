@@ -1,21 +1,38 @@
 const fs = require('fs')
 const path = require('path')
-/**
- * Get the entries for a directory.
- * @param {string} directory The directory to search in.
- * @returns {string[]} The entries in the directory or an empty array on error.
- * @private
- */
-function getDirectoryEntries (directory) {
-  try {
-    return fs.readdirSync(directory)
-  } catch (ex) {
-    return []
+const homeDir = require('home-dir')
+
+const rootDir = path.dirname(require.main.filename)
+const possibleFiles = [
+  '.czrc',
+  '.czrc.js'
+]
+
+function findConfigFileInDir (dir) {
+  // recursive find parent folders
+  for (const fname of possibleFiles) {
+    let f = path.join(dir, fname)
+    if (fs.lstatSync(f).isFile) {
+      return f
+    }
   }
+  return null
+}
+function findConfigFile () {
+  let f
+  f = findConfigFileInDir(rootDir)
+  if (f) {
+    return f
+  }
+  f = findConfigFileInDir(homeDir())
+  if (f) {
+    return f
+  }
+  throw new Error(`.czrc file not found`)
 }
 
 function loadConfig (file) {
-  var promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     if (file.match(/\.js$/)) {
       const js = require(file)
       resolve(js)
@@ -23,39 +40,24 @@ function loadConfig (file) {
       fs.readFile(file, 'utf8', (err, content) => {
         if (err) reject(err)
         try {
-          const json = JSON.parse(content) || null
-          resolve(json)
+          resolve(JSON.parse(content))
         } catch (e) {
           reject(e)
         }
       })
     }
   })
-    .then(res => {
-      if (res.config && res.config['cz-template']) {
-        return res.config['cz-template']
-      }
-      return {}
-    })
-    .catch(e => {
-      // TODO: retry homeDir('.czrc')
-      // var file = path.resolve('.czrc')
-      console.error(e)
-    })
-  return promise
 }
 
-module.exports = dir => {
-  dir = dir || process.cwd()
-  const dirs = getDirectoryEntries(dir)
-  let fileName = ''
-  for (let i = 0; i < dirs.length; i++) {
-    const result = dirs[i].match('.czrc')
-    if (result) {
-      fileName = result.input
-      continue
-    }
+function extractConfig (wholeObj) {
+  if (wholeObj && wholeObj.config && wholeObj.config['cz-template']) {
+    return wholeObj.config['cz-template']
   }
-  let file = (fileName === '') ? path.join(__dirname, '..', '.czrc') : path.join(process.cwd(), fileName)
-  return loadConfig(file)
+  return {}
+}
+
+module.exports = () => {
+  let f = findConfigFile()
+  let rawObj = loadConfig(f)
+  return extractConfig(rawObj)
 }
