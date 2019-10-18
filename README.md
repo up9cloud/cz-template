@@ -15,21 +15,22 @@ $ npm i -g cz-template
 
 ## Usage
 
-> The ./czrc look like...
+> Add repo `./czrc` or global `~/.czrc` setting file to work
 
-1. You can add `questions`, `scopes`, `types` to extend default setting.
-2. Change `formula` with es6 strings template to format commit message
+1. You can add more `questions`, `scopes`, `types` to extend default settings.
+2. Change `formula` with `util.format` template string to format commit message head, default is `%s%s%s: %s`
+3. Change `formulaKeys` for ordering the values (specifiers for the template), default is `['emoji', 'title', 'scope', 'subject']`
   [reference](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#type)
-  Support:
-    - ${title}: This will fill commit type e.q. feat, fix, ...
-    - ${emoji}: Fill emoji icon
-    - ${subject}: Fill subject of commit message
-    - ${description}: Fill description about commit message
-    - ${scope}: Fill scope name
-  e.q. ${title} ${emoji} ${scope}: ${subject => fix 🎉 (common): Fixed example
+  Support keys:
+    - title: This will fill commit type e.q. feat, fix, ...
+    - emoji: Fill emoji icon
+    - subject: Fill subject of commit message
+    - description: Fill description about commit message
+    - scope: Fill scope name
+    - ...: any keys in questions result, except body
+  e.q. `%s%s%s: %s` with `['emoji', 'title', 'scope', 'subject']` would be: `🎉fix(common): I fixed something, yeah!`
 
 > NOTE: Have a issue with `scopes`
-
 
 ```json
 {
