@@ -46,7 +46,7 @@ function loadConfig (file) {
         }
       })
     }
-  })
+  }).then(rawObj => extractConfig(rawObj))
 }
 
 function extractConfig (wholeObj) {
@@ -58,6 +58,5 @@ function extractConfig (wholeObj) {
 
 module.exports = () => {
   let f = findConfigFile()
-  let rawObj = loadConfig(f)
-  return extractConfig(rawObj)
+  return loadConfig(f)
 }
