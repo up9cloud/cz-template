@@ -97,7 +97,7 @@ module.exports = (config) => {
   })
 
   return types.map(choice => ({
-    name: `${choice.name}${choice.emoji}: ${choice.description}`,
+    name: `${choice.emoji} ${choice.name}: ${choice.description}`,
     value: choice,
     code: choice.code,
   }))
